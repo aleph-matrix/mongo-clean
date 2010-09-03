@@ -3,7 +3,7 @@ load("jstests/libs/geo_near_random.js");
 
 var test = new GeoNearRandomTest("nightly.geo_near_random2");
 
-test.insertPts(100000);
+test.insertPts(10000);
 
 opts = {sphere:0, nToTest:test.nPts*0.01}; 
 test.testPt([0,0], opts);
