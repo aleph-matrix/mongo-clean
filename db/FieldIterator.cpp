@@ -21,24 +21,23 @@
 
 namespace mongo
 {
-    FieldIterator::FieldIterator(shared_ptr<Document> pTheDocument,
-			 const vector<shared_ptr<const Field>> *pTheVFieldPtr):
+    FieldIterator::FieldIterator(shared_ptr<Document> pTheDocument):
 	pDocument(pTheDocument),
-	pVFieldPtr(pTheVFieldPtr),
-	currentField(0)
+	index(0)
     {
-	/* record the number of fields */
-	nField = pVFieldPtr->size();
     }
 
     bool FieldIterator::more() const
     {
-	return currentField < nField;
+	return (index < pDocument->vFieldName.size());
     }
 
-    shared_ptr<const Field> FieldIterator::next()
+    pair<string, shared_ptr<const Value>> FieldIterator::next()
     {
 	assert(more());
-	return (*pVFieldPtr)[currentField++];
+	pair<string, shared_ptr<const Value>> result(
+	    pDocument->vFieldName[index], pDocument->vpValue[index]);
+	++index;
+	return result;
     }
 }
