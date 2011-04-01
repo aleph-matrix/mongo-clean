@@ -20,7 +20,6 @@
 
 #include "db/Cursor.h"
 #include "db/pipeline/document.h"
-#include "db/pipeline/expression.h"
 
 namespace mongo {
     DocumentSourceCursor::DocumentSourceCursor(shared_ptr<Cursor> pTheCursor):
@@ -47,6 +46,11 @@ namespace mongo {
         shared_ptr<Document> pDocument(
             Document::createFromBsonObj(&documentObj));
         return pDocument;
+    }
+
+    void DocumentSourceCursor::setSource(shared_ptr<DocumentSource> pSource) {
+	/* this doesn't take a source */
+	assert(false);
     }
 
     DocumentSourceCursor::~DocumentSourceCursor() {
