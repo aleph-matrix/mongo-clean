@@ -6,14 +6,18 @@ replTest.initiate();
 var master = replTest.getMaster();
 
 // do a write
+print("\ndo a write");
 master.getDB("foo").bar.insert({x:1});
 replTest.awaitReplication();
 
 // lock secondary
+print("\nlock secondary");
 var locked = replTest.liveNodes.slaves[0];
-locked.getDB("admin").runCommand({fsync : 1, lock : 1});
+printjson( locked.getDB("admin").runCommand({fsync : 1, lock : 1}) );
 
-print("waiting 11 seconds");
+print("\nwaiting 11ish seconds");
+
+sleep(2000);
 
 for (var i = 0; i < 11; i++) {
     // do another write
@@ -21,11 +25,14 @@ for (var i = 0; i < 11; i++) {
     sleep(1000);
 }
 
+print("\n do stepdown that should not work");
+
 // this should fail, so we don't need to try/catch
 var result = master.getDB("admin").runCommand({replSetStepDown: 10});
 printjson(result);
 assert.eq(result.ok, 0);
 
+print("\n do stepdown that should work");
 try {
     master.getDB("admin").runCommand({replSetStepDown: 50, force : true});
 }
@@ -37,15 +44,16 @@ var r2 = master.getDB("admin").runCommand({ismaster : 1});
 assert.eq(r2.ismaster, false);
 assert.eq(r2.secondary, true);
 
-print("unlock");
+print("\nunlock");
 printjson(locked.getDB("admin").$cmd.sys.unlock.findOne());
 
-print("reset stepped down time");
+print("\nreset stepped down time");
 master.getDB("admin").runCommand({replSetFreeze:0});
 master = replTest.getMaster();
 
-print("make config with priorities");
+print("\nmake 1 config with priorities");
 var config = master.getDB("local").system.replset.findOne();
+print("\nmake 2");
 config.version++;
 config.members[0].priority = 2;
 config.members[1].priority = 1;
@@ -57,11 +65,13 @@ try {
 catch (e) {
     print(e);
 }
+
+print("\nawait");
 replTest.awaitReplication();
 
 master = replTest.getMaster();
 var firstMaster = master;
-print("master is now "+firstMaster);
+print("\nmaster is now "+firstMaster);
 
 try {
     printjson(master.getDB("admin").runCommand({replSetStepDown : 100, force : true}));
@@ -70,7 +80,7 @@ catch (e) {
     print(e);
 }
 
-print("get a master");
+print("\nget a master");
 replTest.getMaster();
 
 assert.soon(function() {
@@ -79,7 +89,8 @@ assert.soon(function() {
     }, 'making sure '+firstMaster+' isn\'t still master', 60000);
 
 
-print("check shutdown command");
+print("\ncheck shutdown command");
+
 master = replTest.liveNodes.master;
 var slave = replTest.liveNodes.slaves[0];
 var slaveId = replTest.getNodeId(slave);
@@ -91,12 +102,16 @@ catch (e) {
     print(e);
 }
 
-print("sleeping");
+print("\nsleeping");
+
 sleep(2000);
 
-print("running shutdown on master: "+master);
+print("\nrunning shutdown without force on master: "+master);
+
 result = replTest.getMaster().getDB("admin").runCommand({shutdown : 1, timeoutSecs : 3});
 assert.eq(result.ok, 0);
+
+print("\nsend shutdown command");
 
 var thrown = false;
 try {
@@ -108,4 +123,8 @@ catch (e) {
 }
 assert(thrown);
 
+print("\nOK 1");
+
 replTest.stopSet();
+
+print("OK 2");
