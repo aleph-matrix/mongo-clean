@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include "../scripting/engine.h"
-
 namespace mongo {
 
+    class Scope;
+    
     namespace shellUtils {
 
         // Scoped management of mongo program instances.  Simple implementation:
@@ -33,6 +33,6 @@ namespace mongo {
         void KillMongoProgramInstances();
         
         void goingAwaySoon();
-        void installShellLauncher( Scope& scope );
+        void installShellUtilsLauncher( Scope& scope );
     }
 }
