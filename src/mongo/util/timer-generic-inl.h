@@ -26,6 +26,8 @@
 
 #pragma once
 
+#define MONGO_TIMER_IMPL_GENERIC
+
 #include "mongo/util/time_support.h"
 
 namespace mongo {
