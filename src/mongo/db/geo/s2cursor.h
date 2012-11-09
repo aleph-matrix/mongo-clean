@@ -57,7 +57,7 @@ namespace mongo {
         // Make an object that describes the restrictions on all possible valid keys.
         // It's kind of a monstrous object.  Thanks, FieldRangeSet, for doing all the work
         // for us.
-        BSONObj makeUnifiedFRS();
+        BSONObj makeFRSObject();
 
         // Need this to make a FieldRangeSet.
         const IndexDetails *_details;
