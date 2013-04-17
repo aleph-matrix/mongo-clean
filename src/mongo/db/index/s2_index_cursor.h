@@ -40,6 +40,7 @@ namespace mongo {
     class S2IndexCursor : public IndexCursor {
     public:
         S2IndexCursor(const S2IndexingParams& params, IndexDescriptor* descriptor);
+        virtual ~S2IndexCursor() { }
 
         // Parse the query, figure out if it's a near or a non-near predicate, and create the
         // appropriate sub-cursor.
