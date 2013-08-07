@@ -72,14 +72,15 @@ namespace mongo {
             return false;
         }
 
-        /**
-         * TODO: Explicit yielding is deprecated pending a ClientCursor rewrite.
-         */
-        virtual void yield() { _runner->yield(); }
-        virtual void unYield() { _runner->unYield(); }
+        virtual void saveState() { _runner->saveState(); }
+        virtual void restoreState() { _runner->restoreState(); }
 
         virtual void invalidate(const DiskLoc& dl) {
             _runner->invalidate(dl);
+        }
+
+        virtual const CanonicalQuery& getQuery() {
+            return *_canonicalQuery;
         }
 
     private:
