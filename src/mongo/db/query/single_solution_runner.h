@@ -38,57 +38,36 @@ namespace mongo {
         SingleSolutionRunner(CanonicalQuery* canonicalQuery, QuerySolution* soln,
                              PlanStage* root, WorkingSet* ws)
             : _canonicalQuery(canonicalQuery), _solution(soln),
-              _exec(new PlanExecutor(ws, root)), _killed(false) { }
+              _exec(new PlanExecutor(ws, root)) { }
 
-        Runner::RunnerState getNext(BSONObj* objOut) {
-            if (_killed) { return Runner::RUNNER_DEAD; }
-            return _exec->getNext(objOut);
+        Runner::RunnerState getNext(BSONObj* objOut, DiskLoc* dlOut) {
+            return _exec->getNext(objOut, dlOut);
             // TODO: I'm not convinced we want to cache this run.  What if it's a collscan solution
             // and the user adds an index later?  We don't want to reach for this.  But if solving
             // the query is v. hard, we do want to cache it.  Maybe we can remove single solution
             // cache entries when we build an index?
         }
 
-        virtual void saveState() {
-            if (!_killed) {
-                _exec->saveState();
-            }
+        virtual void saveState() { _exec->saveState(); }
+
+        virtual bool restoreState() { return _exec->restoreState(); }
+
+        virtual void setYieldPolicy(Runner::YieldPolicy policy) {
+            _exec->setYieldPolicy(policy);
         }
 
-        virtual void restoreState() {
-            if (!_killed) {
-                _exec->restoreState();
-            }
-        }
-
-        virtual void invalidate(const DiskLoc& dl) {
-            if (!_killed) {
-                _exec->invalidate(dl);
-            }
-        }
+        virtual void invalidate(const DiskLoc& dl) { _exec->invalidate(dl); }
 
         virtual const CanonicalQuery& getQuery() { return *_canonicalQuery; }
 
-        virtual void kill() { _killed = true; }
+        virtual const string& ns() { return getQuery().getParsed().ns(); }
 
-        virtual bool forceYield() {
-            saveState();
-            ClientCursor::registerRunner(this);
-            ClientCursor::staticYield(ClientCursor::suggestYieldMicros(),
-                                      getQuery().getParsed().ns(),
-                                      NULL);
-            ClientCursor::deregisterRunner(this);
-            if (!_killed) { restoreState(); }
-            return !_killed;
-        }
+        virtual void kill() { _exec->kill(); }
 
     private:
         scoped_ptr<CanonicalQuery> _canonicalQuery;
         scoped_ptr<QuerySolution> _solution;
         scoped_ptr<PlanExecutor> _exec;
-
-        // Were we killed during a yield?
-        bool _killed;
     };
 
 }  // namespace mongo
