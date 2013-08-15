@@ -18,14 +18,28 @@
 
 #pragma once
 
-#include "mongo/db/namespace_details.h"
+#include <string>
+
+#include "mongo/base/string_data.h"
+#include "mongo/db/diskloc.h"
 
 namespace mongo {
 
-    class Collection {
+    class Database;
+    class NamespaceDetails;
+
+    /**
+     * this is NOT safe through a yield right now
+     * not sure if it will be, or what yet
+     */
+    class CollectionTemp {
     public:
+        CollectionTemp( const StringData& fullNS,
+                        NamespaceDetails* details,
+                        Database* database );
 
     private:
+        std::string _ns; // TODO: this copy might be annoyingly slow
         NamespaceDetails* _details;
         Database* _database;
     };
