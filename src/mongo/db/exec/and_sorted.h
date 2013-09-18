@@ -69,7 +69,7 @@ namespace mongo {
 
     private:
         // Find a node to AND against.
-        PlanStage::StageState getTargetLoc();
+        PlanStage::StageState getTargetLoc(WorkingSetID* out);
 
         // Move a child which hasn't advanced to the target node forward.
         // Returns the target node in 'out' if all children successfully advance to it.
