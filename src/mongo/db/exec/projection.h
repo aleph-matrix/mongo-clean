@@ -30,9 +30,9 @@
 
 #include "mongo/db/diskloc.h"
 #include "mongo/db/exec/plan_stage.h"
-#include "mongo/db/exec/query_projection.h"
 #include "mongo/db/jsobj.h"
 #include "mongo/db/matcher/expression.h"
+#include "mongo/db/query/parsed_projection.h"
 
 namespace mongo {
 
@@ -41,7 +41,7 @@ namespace mongo {
      */
     class ProjectionStage : public PlanStage {
     public:
-        ProjectionStage(QueryProjection* projection, WorkingSet* ws, PlanStage* child,
+        ProjectionStage(ParsedProjection* projection, WorkingSet* ws, PlanStage* child,
                         const MatchExpression* filter);
         virtual ~ProjectionStage();
 
@@ -55,7 +55,8 @@ namespace mongo {
         PlanStageStats* getStats();
 
     private:
-        scoped_ptr<QueryProjection> _projection;
+        // Not owned by us.
+        ParsedProjection* _projection;
 
         // _ws is not owned by us.
         WorkingSet* _ws;
