@@ -28,15 +28,18 @@
 
 #pragma once
 
-#include "mongo/db/clientcursor.h"
-#include "mongo/db/query/canonical_query.h"
-#include "mongo/db/query/lite_parsed_query.h"
-#include "mongo/db/query/plan_cache.h"
-#include "mongo/db/query/plan_executor.h"
+#include <boost/scoped_ptr.hpp>
+#include <string>
+
+#include "mongo/base/status.h"
 #include "mongo/db/query/runner.h"
-#include "mongo/db/query/stage_builder.h"
 
 namespace mongo {
+
+    class BSONObj;
+    class CanonicalQuery;
+    class DiskLoc;
+    class TypeExplain;
 
     /**
      * EOFRunner is EOF immediately and doesn't do anything except return EOF and possibly die
@@ -44,32 +47,37 @@ namespace mongo {
      */
     class EOFRunner : public Runner {
     public:
-        EOFRunner(CanonicalQuery* cq, const string& ns) : _cq(cq), _ns(ns) { }
 
-        Runner::RunnerState getNext(BSONObj* objOut, DiskLoc* dlOut) {
-            return Runner::RUNNER_EOF;
-        }
+        /* Takes onwership */
+        EOFRunner(CanonicalQuery* cq, const std::string& ns);
 
-        virtual bool isEOF() { return true; }
+        virtual ~EOFRunner();
 
-        virtual void saveState() { }
+        virtual Runner::RunnerState getNext(BSONObj* objOut, DiskLoc* dlOut);
 
-        virtual bool restoreState() {
-            // TODO: Does this value matter?
-            return false;
-        }
+        virtual bool isEOF();
 
-        virtual void setYieldPolicy(Runner::YieldPolicy policy) { }
+        virtual void saveState();
 
-        virtual void invalidate(const DiskLoc& dl) { }
+        virtual bool restoreState();
 
-        virtual const string& ns() { return _ns; }
+        virtual void setYieldPolicy(Runner::YieldPolicy policy);
 
-        virtual void kill() { }
+        virtual void invalidate(const DiskLoc& dl);
+
+        virtual const std::string& ns();
+
+        virtual void kill();
+
+        /**
+         * Always returns OK, allocating and filling in '*explain' with a fake ("zeroed")
+         * collection scan plan. Caller owns '*explain', though.
+         */
+        virtual Status getExplainPlan(TypeExplain** explain) const;
 
     private:
-        scoped_ptr<CanonicalQuery> _cq;
-        string _ns;
+        boost::scoped_ptr<CanonicalQuery> _cq;
+        std::string _ns;
     };
 
 }  // namespace mongo

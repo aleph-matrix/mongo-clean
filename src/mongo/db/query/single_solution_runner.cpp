@@ -28,18 +28,89 @@
 
 #include "mongo/db/query/single_solution_runner.h"
 
+#include "mongo/db/diskloc.h"
+#include "mongo/db/jsobj.h"
+#include "mongo/db/exec/plan_stage.h"
+#include "mongo/db/exec/working_set.h"
+#include "mongo/db/query/canonical_query.h"
+#include "mongo/db/query/explain_plan.h"
+#include "mongo/db/query/type_explain.h"
+#include "mongo/db/query/plan_executor.h"
+#include "mongo/db/query/query_solution.h"
+
 namespace mongo {
 
-    void SingleSolutionRunner::writeExplainTo(BSONObjBuilder* bob) const {
-        if (NULL == bob) {
-            return;
+    SingleSolutionRunner::SingleSolutionRunner(CanonicalQuery* canonicalQuery,
+                                               QuerySolution* soln,
+                                               PlanStage* root,
+                                               WorkingSet* ws)
+        : _canonicalQuery(canonicalQuery),
+          _solution(soln),
+          _exec(new PlanExecutor(ws, root)) {
+    }
+
+    SingleSolutionRunner::~SingleSolutionRunner() {
+    }
+
+    Runner::RunnerState SingleSolutionRunner::getNext(BSONObj* objOut, DiskLoc* dlOut) {
+        return _exec->getNext(objOut, dlOut);
+        // TODO: I'm not convinced we want to cache this run.  What if it's a collscan solution
+        // and the user adds an index later?  We don't want to reach for this.  But if solving
+        // the query is v. hard, we do want to cache it.  Maybe we can remove single solution
+        // cache entries when we build an index?
+    }
+
+    bool SingleSolutionRunner::isEOF() {
+        return _exec->isEOF();
+    }
+
+    void SingleSolutionRunner::saveState() {
+        _exec->saveState();
+    }
+
+    bool SingleSolutionRunner::restoreState() {
+        return _exec->restoreState();
+    }
+
+    void SingleSolutionRunner::setYieldPolicy(Runner::YieldPolicy policy) {
+        _exec->setYieldPolicy(policy);
+    }
+
+    void SingleSolutionRunner::invalidate(const DiskLoc& dl) {
+        _exec->invalidate(dl);
+    }
+
+    const std::string& SingleSolutionRunner::ns() {
+        return _canonicalQuery->getParsed().ns();
+    }
+
+    void SingleSolutionRunner::kill() {
+        _exec->kill();
+    }
+
+    Status SingleSolutionRunner::getExplainPlan(TypeExplain** explain) const {
+        dassert(_exec.get());
+
+        scoped_ptr<PlanStageStats> stats(_exec->getStats());
+        if (NULL == stats.get()) {
+            return Status(ErrorCodes::InternalError, "no stats available to explain plan");
         }
-        bob->append("runner", "SingleSolutionRunner");
-        bob->append("nSolutions", 1);
-        {
-            BSONObjBuilder subBuilder(bob->subobjStart("exec"));
-            _exec->writeExplainTo(&subBuilder);
+
+        Status status = explainPlan(*stats, explain, true /* full details */);
+        if (!status.isOK()) {
+            return status;
         }
+
+        // Fill in explain fields that are accounted by on the runner level.
+        TypeExplain* chosenPlan = NULL;
+        explainPlan(*stats, &chosenPlan, false /* no full details */);
+        if (chosenPlan) {
+            (*explain)->addToAllPlans(chosenPlan);
+        }
+        (*explain)->setNScannedObjectsAllPlans((*explain)->getNScannedObjects());
+        (*explain)->setNScannedAllPlans((*explain)->getNScanned());
+
+        return Status::OK();
     }
 
 } // namespace mongo

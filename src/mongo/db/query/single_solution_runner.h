@@ -28,15 +28,22 @@
 
 #pragma once
 
-#include "mongo/db/clientcursor.h"
-#include "mongo/db/query/canonical_query.h"
-#include "mongo/db/query/lite_parsed_query.h"
-#include "mongo/db/query/plan_cache.h"
-#include "mongo/db/query/plan_executor.h"
+#include <boost/scoped_ptr.hpp>
+#include <string>
+
+#include "mongo/base/status.h"
 #include "mongo/db/query/runner.h"
-#include "mongo/db/query/stage_builder.h"
 
 namespace mongo {
+
+    class BSONObj;
+    class CanonicalQuery;
+    class DiskLoc;
+    class PlanExecutor;
+    class PlanStage;
+    class QuerySolution;
+    class TypeExplain;
+    class WorkingSet;
 
     /**
      * SingleSolutionRunner runs a plan that was the only possible solution to a query.  It exists
@@ -44,42 +51,40 @@ namespace mongo {
      */
     class SingleSolutionRunner : public Runner {
     public:
-        /**
-         * Takes ownership of both arguments.
-         */
+
+        /** Takes ownership of all the arguments. */
         SingleSolutionRunner(CanonicalQuery* canonicalQuery, QuerySolution* soln,
-                             PlanStage* root, WorkingSet* ws)
-            : _canonicalQuery(canonicalQuery), _solution(soln),
-              _exec(new PlanExecutor(ws, root)) { }
+                             PlanStage* root, WorkingSet* ws);
 
-        Runner::RunnerState getNext(BSONObj* objOut, DiskLoc* dlOut) {
-            return _exec->getNext(objOut, dlOut);
-            // TODO: I'm not convinced we want to cache this run.  What if it's a collscan solution
-            // and the user adds an index later?  We don't want to reach for this.  But if solving
-            // the query is v. hard, we do want to cache it.  Maybe we can remove single solution
-            // cache entries when we build an index?
-        }
+        virtual ~SingleSolutionRunner();
 
-        virtual bool isEOF() { return _exec->isEOF(); }
+        Runner::RunnerState getNext(BSONObj* objOut, DiskLoc* dlOut);
 
-        virtual void saveState() { _exec->saveState(); }
+        virtual bool isEOF();
 
-        virtual bool restoreState() { return _exec->restoreState(); }
+        virtual void saveState();
 
-        virtual void setYieldPolicy(Runner::YieldPolicy policy) {
-            _exec->setYieldPolicy(policy);
-        }
+        virtual bool restoreState();
 
-        virtual void invalidate(const DiskLoc& dl) { _exec->invalidate(dl); }
+        virtual void setYieldPolicy(Runner::YieldPolicy policy);
 
-        virtual const string& ns() { return _canonicalQuery->getParsed().ns(); }
+        virtual void invalidate(const DiskLoc& dl);
 
-        virtual void kill() { _exec->kill(); }
+        virtual const std::string& ns();
+
+        virtual void kill();
+
+        /**
+         * Returns OK, allocating and filling in '*explain' with the details of the plan used
+         * by this runner. Caller takes ownership of '*explain'. Otherwise, return a status
+         * describing the error.
+         */
+        virtual Status getExplainPlan(TypeExplain** explain) const;
 
     private:
-        scoped_ptr<CanonicalQuery> _canonicalQuery;
-        scoped_ptr<QuerySolution> _solution;
-        scoped_ptr<PlanExecutor> _exec;
+        boost::scoped_ptr<CanonicalQuery> _canonicalQuery;
+        boost::scoped_ptr<QuerySolution> _solution;
+        boost::scoped_ptr<PlanExecutor> _exec;
     };
 
 }  // namespace mongo
