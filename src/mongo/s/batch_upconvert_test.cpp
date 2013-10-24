@@ -36,7 +36,7 @@
 #include "mongo/unittest/unittest.h"
 #include "mongo/util/net/message.h"
 
-
+// TODO: Fixup server_options dependencies
 #ifdef MONGO_SSL
 namespace mongo {
         Status storeSSLServerOptions(const optionenvironment::Environment& params) {
