@@ -35,10 +35,14 @@
 #include "mongo/db/jsobj.h"
 
 namespace mongo {
+
+    class ClientBasic;
+
 namespace rename_collection {
 
-    void addPrivilegesRequiredForRenameCollection(const BSONObj& cmdObj,
-                                                  std::vector<Privilege>* out);
+    Status checkAuthForRenameCollectionCommand(ClientBasic* client,
+                                               const std::string& dbname,
+                                               const BSONObj& cmdObj);
 
 } // namespace rename_collection
 } // namespace mongo
