@@ -53,8 +53,8 @@ namespace mongo {
     // (Interpreting the response requires the request object as well.)
     //
 
-    void batchToLastError( const BatchedCommandRequest& request,
-                           const BatchedCommandResponse& response,
-                           LastError* error );
+    void batchErrorToLastError( const BatchedCommandRequest& request,
+                                const BatchedCommandResponse& response,
+                                LastError* error );
 
 }
