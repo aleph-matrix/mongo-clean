@@ -39,18 +39,10 @@ namespace mongo {
         /**
          * Returns OK if all the below conditions on 'field' are valid:
          *   + Non-empty
-         *   + Not the _id field (or a subfield of the _id field, such as _id.x.y)
          *   + Does not start or end with a '.'
-         *   + Does not start with a $ (unless a DBRef part $id/$ref/$db not at the root)
          * Otherwise returns a code indicating cause of failure.
          */
         Status isUpdatable(const FieldRef& field);
-
-        /**
-         * Same behavior of isUpdatable but allowing update fields to start with '$'. This
-         * supports $unset on legacy fields.
-         */
-        Status isUpdatableLegacy(const FieldRef& field);
 
         /**
          * Returns true, the position 'pos' of the first $-sign if present in 'fieldRef', and
