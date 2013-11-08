@@ -50,6 +50,7 @@ namespace mongo {
         STAGE_LIMIT,
         STAGE_OR,
         STAGE_PROJECTION,
+        STAGE_SHARDING_FILTER,
         STAGE_SKIP,
         STAGE_SORT,
         STAGE_SORT_MERGE,
