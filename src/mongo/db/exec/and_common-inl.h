@@ -50,6 +50,15 @@ namespace mongo {
                 }
                 if (!found) { dest->keyData.push_back(src->keyData[i]); }
             }
+
+            // Merge computed data.
+            if (!dest->hasComputed(WSM_COMPUTED_TEXT_SCORE) && src->hasComputed(WSM_COMPUTED_TEXT_SCORE)) {
+                dest->addComputed(src->getComputed(WSM_COMPUTED_TEXT_SCORE)->clone());
+            }
+
+            if (!dest->hasComputed(WSM_COMPUTED_GEO_DISTANCE) && src->hasComputed(WSM_COMPUTED_GEO_DISTANCE)) {
+                dest->addComputed(src->getComputed(WSM_COMPUTED_GEO_DISTANCE)->clone());
+            }
         }
     };
 
