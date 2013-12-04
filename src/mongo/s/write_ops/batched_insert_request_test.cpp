@@ -26,6 +26,7 @@ namespace {
     using mongo::BSONArray;
     using mongo::BSONObj;
     using mongo::BatchedInsertRequest;
+    using mongo::BatchedRequestMetadata;
     using mongo::BSONArrayBuilder;
     using mongo::OID;
     using mongo::OpTime;
@@ -48,8 +49,10 @@ namespace {
                  BatchedInsertRequest::documents() << insertArray <<
                  BatchedInsertRequest::writeConcern(writeConcernObj) <<
                  BatchedInsertRequest::ordered(true) <<
-                 BatchedInsertRequest::shardVersion() << shardVersionArray <<
-                 BatchedInsertRequest::session(0));
+                 BatchedInsertRequest::metadata() << BSON(
+                     BatchedRequestMetadata::shardName("shard0000") <<
+                     BatchedRequestMetadata::shardVersion() << shardVersionArray <<
+                     BatchedRequestMetadata::session(0)));
 
         string errMsg;
         BatchedInsertRequest request;
