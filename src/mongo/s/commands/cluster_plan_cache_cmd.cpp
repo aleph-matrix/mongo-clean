@@ -66,6 +66,10 @@ namespace mongo {
             return Command::NONE;
         }
 
+        void help(stringstream& ss) const {
+            ss << _helpText;
+        }
+
         Status checkAuthForCommand( ClientBasic* client,
                                     const std::string& dbname,
                                     const BSONObj& cmdObj ) {

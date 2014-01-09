@@ -89,10 +89,10 @@ namespace mongo {
                                            BSONObjBuilder* bob) = 0;
 
         /**
-         * Parses query shape from command object and returns plan cache key.
+         * Validatess query shape from command object and returns canonical query.
          */
-        static Status makeCacheKey(const std::string& ns, const BSONObj& cmdObj,
-                                   PlanCacheKey* keyOut);
+        static Status canonicalize(const std::string& ns, const BSONObj& cmdObj,
+                                   CanonicalQuery** canonicalQueryOut);
 
     private:
         std::string helpText;
