@@ -34,6 +34,7 @@
 #include "mongo/db/client.h"
 #include "mongo/db/dur.h"
 #include "mongo/db/jsobj.h"
+#include "mongo/db/repl/initial_sync.h"
 #include "mongo/db/repl/sync.h"
 #include "mongo/db/repl/sync_tail.h"
 #include "mongo/util/concurrency/thread_pool.h"
@@ -43,27 +44,9 @@ namespace replset {
 
     class BackgroundSyncInterface;
 
-    /**
-     * Initial clone and sync
-     */
-    class InitialSync : public SyncTail {
-    public:
-        virtual ~InitialSync();
-        InitialSync(BackgroundSyncInterface *q);
-
-        /**
-         * Creates the initial oplog entry: applies applyGTEObj and writes it to the oplog.  Then
-         * this runs oplogApplySegment allowing recloning documents.
-         */
-        BSONObj oplogApplication(const BSONObj& applyGTEObj, const BSONObj& minValidObj);
-    };
 
     // TODO: move hbmsg into an error-keeping class (SERVER-4444)
     void sethbmsg(const string& s, const int logLevel=0);
-
-    // These free functions are used by the thread pool workers to write ops to the db.
-    void multiSyncApply(const std::vector<BSONObj>& ops, SyncTail* st);
-    void multiInitialSyncApply(const std::vector<BSONObj>& ops, SyncTail* st);
 
 } // namespace replset
 } // namespace mongo
