@@ -28,47 +28,16 @@
 
 #pragma once
 
-#include "mongo/db/jsobj.h"
+#include <ctime>
+#include <string>
+
+#include "mongo/logger/tee.h"
 
 namespace mongo {
 
     // ramlog used for replSet actions
-    extern Tee* rsLog;
+    extern logger::Tee* rsLog;
 
-    // helper functions needed by member.cpp
-    std::string ago(time_t t);
-
-    /* throws */
-    bool requestHeartbeat(const std::string& setname,
-                          const std::string& fromHost,
-                          const std::string& memberFullName,
-                          BSONObj& result,
-                          int myConfigVersion,
-                          int& theirConfigVersion,
-                          bool checkEmpty = false);
-
-    struct HealthOptions {
-        HealthOptions() :  
-            heartbeatSleepMillis(2000), 
-            heartbeatTimeoutMillis( 10000 ),
-            heartbeatConnRetries(2) 
-        { }
-
-        bool isDefault() const { return *this == HealthOptions(); }
-
-        // see http://dochub.mongodb.org/core/replicasetinternals
-        unsigned heartbeatSleepMillis;
-        unsigned heartbeatTimeoutMillis;
-        unsigned heartbeatConnRetries ;
-
-        void check() {
-            uassert(13112, "bad replset heartbeat option", heartbeatSleepMillis >= 10);
-            uassert(13113, "bad replset heartbeat option", heartbeatTimeoutMillis >= 10);
-        }
-
-        bool operator==(const HealthOptions& r) const {
-            return heartbeatSleepMillis==r.heartbeatSleepMillis && heartbeatTimeoutMillis==r.heartbeatTimeoutMillis && heartbeatConnRetries==r.heartbeatConnRetries;
-        }
-    };
-    
+    // helper function needed by member.cpp
+    std::string ago(time_t t);    
 }
