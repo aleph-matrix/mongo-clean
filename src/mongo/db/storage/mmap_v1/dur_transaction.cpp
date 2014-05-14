@@ -31,16 +31,16 @@
 #include "mongo/db/client.h"
 #include "mongo/db/curop.h"
 #include "mongo/db/kill_current_op.h"
-#include "mongo/db/storage/mmap_v1/dur.h"
+#include "mongo/db/storage/mmap_v1/dur_recovery_unit.h"
 
 namespace mongo {
 
-    bool DurTransaction::commitIfNeeded(bool force) {
-        return getDur().commitIfNeeded(force);
+    DurTransaction::DurTransaction() {
+        _recovery.reset(new DurRecoveryUnit());
     }
 
-    bool DurTransaction::isCommitNeeded() const {
-        return getDur().isCommitNeeded();
+    RecoveryUnit* DurTransaction::recoveryUnit() const {
+        return _recovery.get();
     }
 
     ProgressMeter* DurTransaction::setMessage(const char* msg,
@@ -48,18 +48,6 @@ namespace mongo {
                                               unsigned long long progressMeterTotal,
                                               int secondsBetween) {
         return &cc().curop()->setMessage( msg, name, progressMeterTotal, secondsBetween );
-    }
-
-    void* DurTransaction::writingPtr(void* data, size_t len) {
-        return getDur().writingPtr(data, len);
-    }
-
-    void DurTransaction::createdFile(const std::string& filename, unsigned long long len) {
-        getDur().createdFile(filename, len);
-    }
-
-    void DurTransaction::syncDataAndTruncateJournal() {
-        return getDur().syncDataAndTruncateJournal();
     }
 
     void DurTransaction::checkForInterrupt(bool heedMutex) const {
