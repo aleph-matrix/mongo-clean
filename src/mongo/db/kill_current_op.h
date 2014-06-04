@@ -1,5 +1,4 @@
-
-/*
+/**
  *    Copyright (C) 2010 10gen Inc.
  *
  *    This program is free software: you can redistribute it and/or  modify
@@ -47,15 +46,14 @@ namespace mongo {
         MONGO_DISALLOW_COPYING(KillCurrentOp);
     public:
         KillCurrentOp() : _globalKill(false) {}
+
         void killAll();
+
         /**
          * @param i opid of operation to kill
          * @return if operation was found 
          **/
         bool kill(AtomicUInt i);
-
-        /** @return true if global interrupt and should terminate the operation */
-        bool globalInterruptCheck() const { return _globalKill; }
 
         /**
          * @param heedMutex if true and have a write lock, won't kill op since it might be unsafe
@@ -63,13 +61,14 @@ namespace mongo {
         void checkForInterrupt( bool heedMutex = true );
 
         /** @return "" if not interrupted.  otherwise, you should stop. */
-        const char *checkForInterruptNoAssert();
+        const char* checkForInterruptNoAssert();
 
         /** Reset the object to its initial state.  Only for testing. */
         void reset();
 
     private:
         void interruptJs( AtomicUInt *op );
+
         volatile bool _globalKill;
 
         /** 
@@ -80,4 +79,5 @@ namespace mongo {
     };
 
     extern KillCurrentOp killCurrentOp;
-}
+
+}  // namespace mongo
