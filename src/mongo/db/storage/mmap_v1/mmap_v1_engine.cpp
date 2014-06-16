@@ -30,6 +30,15 @@
 
 #include "mongo/db/storage/mmap_v1/mmap_v1_engine.h"
 
+#include "mongo/util/mmap.h"
+
 namespace mongo {
+
+    MMAPV1Engine::~MMAPV1Engine() {
+    }
+
+    int MMAPV1Engine::flushAllFiles( bool sync ) {
+        return MongoFile::flushAll( sync );
+    }
 
 }
