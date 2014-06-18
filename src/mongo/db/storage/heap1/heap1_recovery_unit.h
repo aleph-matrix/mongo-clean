@@ -40,40 +40,28 @@ namespace mongo {
             rollbackPossible = true;
         }
 
-        virtual void beginUnitOfWork() {
-            invariant( false );
-        }
-        virtual void commitUnitOfWork() {
-            invariant( false );
-        }
+        virtual void beginUnitOfWork() {}
+        virtual void commitUnitOfWork() {}
 
-        virtual void endUnitOfWork() {
-            invariant( false );
-        }
+        virtual void endUnitOfWork() {}
 
         virtual bool commitIfNeeded(bool force = false) {
-            invariant( false );
             return false;
         }
 
         virtual bool awaitCommit() {
-            invariant( false );
             return true;
         }
 
         virtual bool isCommitNeeded() const {
-            invariant( false );
             return false;
         }
 
         virtual void* writingPtr(void* data, size_t len) {
-            invariant( false );
             return data;
         }
 
-        virtual void syncDataAndTruncateJournal() {
-            invariant( false );
-        }
+        virtual void syncDataAndTruncateJournal() {}
 
         bool rollbackPossible;
     };
