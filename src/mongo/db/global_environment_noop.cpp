@@ -36,6 +36,12 @@ namespace mongo {
         return NULL;
     }
 
+    void GlobalEnvironmentNoop::setGlobalStorageEngine(const std::string& name) {
+    }
+
+    void GlobalEnvironmentNoop::registerStorageEngine(const std::string& name,
+                                                      const StorageEngine::Factory* factory) { }
+
     void GlobalEnvironmentNoop::setKillAllOperations() { }
 
     void GlobalEnvironmentNoop::unsetKillAllOperations() { }
