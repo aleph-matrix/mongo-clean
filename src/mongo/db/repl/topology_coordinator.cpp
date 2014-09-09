@@ -64,50 +64,5 @@ namespace {
 
     TopologyCoordinator::~TopologyCoordinator() {}
 
-    TopologyCoordinator::HeartbeatResponseAction
-    TopologyCoordinator::HeartbeatResponseAction::makeNoAction() {
-        return HeartbeatResponseAction();
-    }
-
-    TopologyCoordinator::HeartbeatResponseAction
-    TopologyCoordinator::HeartbeatResponseAction::makeReconfigAction() {
-        HeartbeatResponseAction result;
-        result._action = Reconfig;
-        return result;
-    }
-
-    TopologyCoordinator::HeartbeatResponseAction
-    TopologyCoordinator::HeartbeatResponseAction::makeElectAction() {
-        HeartbeatResponseAction result;
-        result._action = StartElection;
-        return result;
-    }
-
-    TopologyCoordinator::HeartbeatResponseAction
-    TopologyCoordinator::HeartbeatResponseAction::makeStepDownSelfAction(int primaryIndex) {
-        HeartbeatResponseAction result;
-        result._action = StepDownSelf;
-        result._primaryIndex = primaryIndex;
-        return result;
-    }
-
-    TopologyCoordinator::HeartbeatResponseAction
-    TopologyCoordinator::HeartbeatResponseAction::makeStepDownRemoteAction(int primaryIndex) {
-        HeartbeatResponseAction result;
-        result._action = StepDownRemotePrimary;
-        result._primaryIndex = primaryIndex;
-        return result;
-    }
-
-    TopologyCoordinator::HeartbeatResponseAction::HeartbeatResponseAction() :
-        _action(NoAction),
-        _primaryIndex(-1),
-        _nextHeartbeatStartDate(0) {
-    }
-
-    void TopologyCoordinator::HeartbeatResponseAction::setNextHeartbeatStartDate(Date_t when) {
-        _nextHeartbeatStartDate = when;
-    }
-
 }  // namespace repl
 }  // namespace mongo
