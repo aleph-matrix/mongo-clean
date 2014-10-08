@@ -30,6 +30,10 @@
 
 #pragma once
 
+#include <boost/shared_array.hpp>
+
+#include "mongo/bson/bsonobj.h"
+
 namespace mongo {
 
     /**
