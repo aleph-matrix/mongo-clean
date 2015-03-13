@@ -46,7 +46,6 @@ namespace mongo {
                             BSONObj pattern,
                             PlanExecutor::YieldPolicy policy,
                             bool justOne,
-                            bool logop = false,
                             bool god = false,
                             bool fromMigrate = false);
 
