@@ -59,6 +59,15 @@ namespace mongo {
         else if (!errmsgElement.eoo()) {
             errmsg = errmsgElement.toString();
         }
+
+        // we can't use startsWith(errmsg, "no such")
+        // as we have errors such as "no such collection"
+        if (code == ErrorCodes::UnknownError &&
+            (str::startsWith(errmsg, "no such cmd") ||
+             str::startsWith(errmsg, "no such command"))) {
+            code = ErrorCodes::CommandNotFound;
+        }
+
         return Status(ErrorCodes::Error(code), errmsg);
     }
 
