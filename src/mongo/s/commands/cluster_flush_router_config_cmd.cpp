@@ -29,6 +29,7 @@
 #include "mongo/platform/basic.h"
 
 #include "mongo/db/commands.h"
+#include "mongo/s/catalog/catalog_cache.h"
 #include "mongo/s/grid.h"
 
 namespace mongo {
@@ -70,7 +71,8 @@ namespace {
                          BSONObjBuilder& result,
                          bool fromRepl) {
 
-            grid.flushConfig();
+            grid.catalogCache()->invalidateAll();
+
             result.appendBool("flushed", true);
             return true;
         }
