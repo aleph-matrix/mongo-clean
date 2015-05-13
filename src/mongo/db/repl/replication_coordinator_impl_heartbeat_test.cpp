@@ -110,7 +110,7 @@ namespace {
         hbResp.setSetName("mySet");
         hbResp.setState(MemberState::RS_PRIMARY);
         hbResp.noteReplSet();
-        hbResp.setVersion(rsConfig.getConfigVersion());
+        hbResp.setConfigVersion(rsConfig.getConfigVersion());
         hbResp.setConfig(rsConfig);
         BSONObjBuilder responseBuilder;
         responseBuilder << "ok" << 1;
@@ -171,7 +171,7 @@ namespace {
         hbResp.setSetName("mySet");
         hbResp.setState(MemberState::RS_PRIMARY);
         hbResp.noteReplSet();
-        hbResp.setVersion(rsConfig.getConfigVersion());
+        hbResp.setConfigVersion(rsConfig.getConfigVersion());
         hbResp.setConfig(rsConfig);
         BSONObjBuilder responseBuilder;
         responseBuilder << "ok" << 1;
