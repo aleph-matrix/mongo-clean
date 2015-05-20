@@ -51,9 +51,10 @@ namespace mongo {
                 stdx::chrono::milliseconds lockTryInterval);
 
     protected:
-        virtual void unlock(const DistLockHandle& lockHandle) BOOST_NOEXCEPT;
 
-        virtual Status checkStatus(const DistLockHandle& lockHandle);
+        virtual void unlock(const DistLockHandle& lockHandle) BOOST_NOEXCEPT override;
+
+        virtual Status checkStatus(const DistLockHandle& lockHandle) override;
 
     private:
         CatalogManager* _lockCatalogue; // Not owned here.
