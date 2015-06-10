@@ -79,7 +79,7 @@ namespace rpc {
         const Message* _message;
 
         // TODO: SERVER-18236
-        BSONObj _metadataPlaceholder{};
+        BSONObj _metadata{};
         BSONObj _commandReply{}; // will hold unowned
     };
 
