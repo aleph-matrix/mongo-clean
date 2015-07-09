@@ -43,10 +43,4 @@ class StatusWith;
  */
 bool setUpSecurityKey(const std::string& filename);
 
-/**
- * This method takes in a filename and returns the contents as a string.
- * It checks that the contents are valid base 64 characters.
- */
-StatusWith<std::string> readSecurityFile(const std::string& filename);
-
 }  // namespace mongo
