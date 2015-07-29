@@ -40,6 +40,9 @@ class BSONObj;
 
 namespace repl {
 
+enum class ReadConcernLevel { kLocalReadConcern, kMajorityReadConcern, kLinearizableReadConcern };
+
+// TODO: make this reflect the fact that level and afterOpTime are in fact optional.
 class ReadConcernArgs {
 public:
     static const std::string kReadConcernFieldName;
@@ -47,12 +50,6 @@ public:
     static const std::string kOpTimeFieldName;
     static const std::string kOpTimestampFieldName;
     static const std::string kLevelFieldName;
-
-    enum class ReadConcernLevel {
-        kLocalReadConcern,
-        kMajorityReadConcern,
-        kLinearizableReadConcern
-    };
 
     ReadConcernArgs();
     ReadConcernArgs(OpTime opTime, ReadConcernLevel level);
@@ -69,6 +66,11 @@ public:
      * }
      */
     Status initialize(const BSONObj& cmdObj);
+
+    /**
+     * Appends level and afterOpTime.
+     */
+    void appendInfo(BSONObjBuilder* builder);
 
     ReadConcernLevel getLevel() const;
     const OpTime& getOpTime() const;
