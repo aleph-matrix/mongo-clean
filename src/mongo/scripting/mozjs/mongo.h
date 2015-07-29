@@ -47,6 +47,7 @@ struct MongoBase : public BaseInfo {
         MONGO_DEFINE_JS_FUNCTION(auth);
         MONGO_DEFINE_JS_FUNCTION(copyDatabaseWithSCRAM);
         MONGO_DEFINE_JS_FUNCTION(cursorFromId);
+        MONGO_DEFINE_JS_FUNCTION(cursorHandleFromId);
         MONGO_DEFINE_JS_FUNCTION(find);
         MONGO_DEFINE_JS_FUNCTION(getClientRPCProtocols);
         MONGO_DEFINE_JS_FUNCTION(getServerRPCProtocols);
@@ -59,7 +60,7 @@ struct MongoBase : public BaseInfo {
         MONGO_DEFINE_JS_FUNCTION(update);
     };
 
-    static const JSFunctionSpec methods[14];
+    static const JSFunctionSpec methods[15];
 
     static const char* const className;
     static const unsigned classFlags = JSCLASS_HAS_PRIVATE;
