@@ -31,7 +31,7 @@
 #include <vector>
 
 #include "mongo/bson/bsonobj.h"
-#include "mongo/db/clientcursor.h"
+#include "mongo/db/cursor_id.h"
 
 namespace mongo {
 
