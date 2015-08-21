@@ -34,6 +34,7 @@
 
 #include "mongo/s/query/router_stage_limit.h"
 #include "mongo/s/query/router_stage_merge.h"
+#include "mongo/s/query/router_stage_mock.h"
 #include "mongo/s/query/router_stage_skip.h"
 #include "mongo/stdx/memory.h"
 
@@ -43,8 +44,15 @@ ClusterClientCursorImpl::ClusterClientCursorImpl(executor::TaskExecutor* executo
                                                  ClusterClientCursorParams params)
     : _isTailable(params.isTailable), _root(buildMergerPlan(executor, std::move(params))) {}
 
+ClusterClientCursorImpl::ClusterClientCursorImpl(std::unique_ptr<RouterStageMock> root)
+    : _root(std::move(root)) {}
+
 StatusWith<boost::optional<BSONObj>> ClusterClientCursorImpl::next() {
-    return _root->next();
+    auto next = _root->next();
+    if (next.isOK() && next.getValue()) {
+        ++_numReturnedSoFar;
+    }
+    return next;
 }
 
 void ClusterClientCursorImpl::kill() {
@@ -53,6 +61,10 @@ void ClusterClientCursorImpl::kill() {
 
 bool ClusterClientCursorImpl::isTailable() const {
     return _isTailable;
+}
+
+long long ClusterClientCursorImpl::getNumReturnedSoFar() const {
+    return _numReturnedSoFar;
 }
 
 std::unique_ptr<RouterExecStage> ClusterClientCursorImpl::buildMergerPlan(
