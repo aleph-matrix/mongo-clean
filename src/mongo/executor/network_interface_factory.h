@@ -34,6 +34,11 @@
 #include "mongo/executor/network_interface.h"
 
 namespace mongo {
+
+namespace rpc {
+class EgressMetadataHook;
+}  // namespace rpc
+
 namespace executor {
 
 class NetworkConnectionHook;
@@ -52,7 +57,9 @@ std::unique_ptr<NetworkInterface> makeNetworkInterface();
  * Different NetworkInterface implementations may be specified setting the
  * 'outboundNetworkImpl' at startup.
  */
-std::unique_ptr<NetworkInterface> makeNetworkInterface(std::unique_ptr<NetworkConnectionHook> hook);
+std::unique_ptr<NetworkInterface> makeNetworkInterface(
+    std::unique_ptr<NetworkConnectionHook> hook,
+    std::unique_ptr<rpc::EgressMetadataHook> metadataHook);
 
 }  // namespace executor
 }  // namespace mongo
