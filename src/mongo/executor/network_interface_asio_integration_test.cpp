@@ -50,7 +50,8 @@ namespace {
 TEST(NetworkInterfaceASIO, TestPing) {
     auto fixture = unittest::getFixtureConnectionString();
 
-    NetworkInterfaceASIO net{stdx::make_unique<AsyncStreamFactory>()};
+    NetworkInterfaceASIO net{stdx::make_unique<AsyncStreamFactory>(),
+                             NetworkInterfaceASIO::Options()};
 
     net.startup();
     auto guard = MakeGuard([&] { net.shutdown(); });
