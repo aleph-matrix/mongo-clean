@@ -27,8 +27,6 @@
  */
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include "mongo/db/jsobj.h"
 
 namespace mongo {
@@ -37,10 +35,6 @@ class BSONObjBuilder;
 class Status;
 template <typename T>
 class StatusWith;
-
-namespace repl {
-class OpTime;
-}  // namespace repl
 
 namespace rpc {
 
@@ -93,24 +87,6 @@ public:
 private:
     Timestamp _lastOpTime;
     OID _lastElectionId;
-};
-
-class ShardingRequestMetadata {
-public:
-    static const char kConfigsvrOpTimeFieldName[];
-
-    /**
-     * Looks in the given command object for a field containing the config server optime, and
-     * returns it if present, or boost::none if not.  Returns a non-ok status on parsing error.
-     * Used for extracting the config server optime on mongod that was sent from a mongos.
-     *
-     * TODO(SERVER-20442): Currently this method extracts this information from the main command
-     * description rather than the actual OP_COMMAND metadata section.  Ideally this information
-     * should be in the metadata, but we currently have no good way to add metadata to all commands
-     * being *sent* to another server.
-     */
-    static StatusWith<boost::optional<repl::OpTime>> extractConfigServerOpTimeIfPresent(
-        const BSONObj& cmdObj);
 };
 
 }  // namespace rpc
