@@ -31,6 +31,7 @@
 #include "mongo/scripting/mozjs/timestamp.h"
 
 #include "mongo/scripting/mozjs/implscope.h"
+#include "mongo/scripting/mozjs/internedstring.h"
 #include "mongo/scripting/mozjs/objectwrapper.h"
 #include "mongo/scripting/mozjs/valuereader.h"
 #include "mongo/scripting/mozjs/valuewriter.h"
@@ -49,8 +50,8 @@ void TimestampInfo::construct(JSContext* cx, JS::CallArgs args) {
     ObjectWrapper o(cx, thisv);
 
     if (args.length() == 0) {
-        o.setNumber("t", 0);
-        o.setNumber("i", 0);
+        o.setNumber(InternedString::t, 0);
+        o.setNumber(InternedString::i, 0);
     } else if (args.length() == 2) {
         if (!args.get(0).isNumber())
             uasserted(ErrorCodes::BadValue, "Timestamp time must be a number");
@@ -64,8 +65,8 @@ void TimestampInfo::construct(JSContext* cx, JS::CallArgs args) {
                       str::stream() << "The first argument must be in seconds; " << t
                                     << " is too large (max " << largestVal << ")");
 
-        o.setValue("t", args.get(0));
-        o.setValue("i", args.get(1));
+        o.setValue(InternedString::t, args.get(0));
+        o.setValue(InternedString::i, args.get(1));
     } else {
         uasserted(ErrorCodes::BadValue, "Timestamp needs 0 or 2 arguments");
     }
