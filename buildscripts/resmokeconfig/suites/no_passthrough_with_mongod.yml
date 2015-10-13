@@ -2,9 +2,6 @@ selector:
   js_test:
     roots:
     - jstests/noPassthroughWithMongod/*.js
-    exclude_files:
-    # SERVER-19093
-    - jstests/noPassthroughWithMongod/httpinterface.js
 
 executor:
   js_test:
