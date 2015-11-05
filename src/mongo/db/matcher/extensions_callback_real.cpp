@@ -30,6 +30,7 @@
 
 #include "mongo/db/matcher/extensions_callback_real.h"
 
+#include "mongo/db/matcher/expression_text.h"
 #include "mongo/db/matcher/expression_where.h"
 #include "mongo/db/namespace_string.h"
 
@@ -37,6 +38,20 @@ namespace mongo {
 
 ExtensionsCallbackReal::ExtensionsCallbackReal(OperationContext* txn, const NamespaceString* nss)
     : _txn(txn), _nss(nss) {}
+
+StatusWithMatchExpression ExtensionsCallbackReal::parseText(BSONElement text) const {
+    auto textParams = extractTextMatchExpressionParams(text);
+    if (!textParams.isOK()) {
+        return textParams.getStatus();
+    }
+
+    auto exp = stdx::make_unique<TextMatchExpression>(std::move(textParams.getValue()));
+    Status status = exp->init();
+    if (!status.isOK()) {
+        return status;
+    }
+    return {std::move(exp)};
+}
 
 StatusWithMatchExpression ExtensionsCallbackReal::parseWhere(BSONElement where) const {
     auto whereParams = extractWhereMatchExpressionParams(where);
