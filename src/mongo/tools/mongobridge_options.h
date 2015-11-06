@@ -44,12 +44,10 @@ class Environment;
 namespace moe = mongo::optionenvironment;
 
 struct MongoBridgeGlobalParams {
-    int port;
-    int delay;
-    int connectTimeoutSec;
+    int port = 0;
     std::string destUri;
 
-    MongoBridgeGlobalParams() : port(0), delay(0), connectTimeoutSec(15) {}
+    MongoBridgeGlobalParams() = default;
 };
 
 extern MongoBridgeGlobalParams mongoBridgeGlobalParams;
