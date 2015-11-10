@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "mongo/db/matcher/expression_parser.h"
+#include "mongo/db/matcher/extensions_callback.h"
 
 namespace mongo {
 
@@ -37,7 +37,7 @@ namespace mongo {
  * be used for matching.  It should be used when parsing context is not available (for example, when
  * the relevant namespace does not exist, or in mongos).
  */
-class ExtensionsCallbackNoop : public MatchExpressionParser::ExtensionsCallback {
+class ExtensionsCallbackNoop : public ExtensionsCallback {
 public:
     /**
      * Returns a TextNoOpMatchExpression, or an error Status if parsing fails.
