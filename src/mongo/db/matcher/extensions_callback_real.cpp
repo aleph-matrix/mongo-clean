@@ -45,8 +45,8 @@ StatusWithMatchExpression ExtensionsCallbackReal::parseText(BSONElement text) co
         return textParams.getStatus();
     }
 
-    auto exp = stdx::make_unique<TextMatchExpression>(std::move(textParams.getValue()));
-    Status status = exp->init();
+    auto exp = stdx::make_unique<TextMatchExpression>();
+    Status status = exp->init(_txn, *_nss, std::move(textParams.getValue()));
     if (!status.isOK()) {
         return status;
     }
