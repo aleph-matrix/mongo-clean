@@ -37,17 +37,12 @@ namespace mongo {
 /**
  * Certain match clauses (the "extension" clauses, namely $text and $where) require context in
  * order to perform parsing. This context is captured inside of an ExtensionsCallback object.
- *
- * The default implementations of parseText() and parseWhere() simply return an error Status.
- * Instead of constructing an ExtensionsCallback object directly, an instance of one of the
- * derived classes (ExtensionsCallbackReal or ExtensionsCallbackNoop) should generally be used
- * instead.
  */
 class ExtensionsCallback {
 public:
-    virtual StatusWithMatchExpression parseText(BSONElement text) const;
+    virtual StatusWithMatchExpression parseText(BSONElement text) const = 0;
 
-    virtual StatusWithMatchExpression parseWhere(BSONElement where) const;
+    virtual StatusWithMatchExpression parseWhere(BSONElement where) const = 0;
 
     virtual ~ExtensionsCallback() {}
 
