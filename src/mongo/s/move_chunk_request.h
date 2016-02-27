@@ -37,7 +37,6 @@
 
 namespace mongo {
 
-class BSONObj;
 class BSONObjBuilder;
 template <typename T>
 class StatusWith;
