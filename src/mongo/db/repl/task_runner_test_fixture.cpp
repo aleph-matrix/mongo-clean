@@ -32,8 +32,8 @@
 
 #include "mongo/db/operation_context_noop.h"
 #include "mongo/db/repl/task_runner.h"
-#include "mongo/platform/atomic_word.h"
 #include "mongo/stdx/functional.h"
+#include "mongo/stdx/memory.h"
 #include "mongo/util/concurrency/old_thread_pool.h"
 
 namespace mongo {
@@ -46,20 +46,6 @@ namespace {
 
 const int kNumThreads = 3;
 
-AtomicInt32 _nextId;
-
-class TaskRunnerOperationContext : public OperationContextNoop {
-public:
-    TaskRunnerOperationContext() : _id(_nextId.fetchAndAdd(1)) {}
-    int getId() const {
-        return _id;
-    }
-
-private:
-    int _id;
-};
-
-
 }  // namespace
 
 Status TaskRunnerTest::getDetectableErrorStatus() {
@@ -70,15 +56,12 @@ int TaskRunnerTest::getOperationContextId(OperationContext* txn) {
     if (!txn) {
         return -1;
     }
-    TaskRunnerOperationContext* taskRunnerTxn = dynamic_cast<TaskRunnerOperationContext*>(txn);
-    if (!taskRunnerTxn) {
-        return -2;
-    }
-    return taskRunnerTxn->getId();
+    return int(txn->getOpID());
 }
 
-OperationContext* TaskRunnerTest::createOperationContext() const {
-    return new TaskRunnerOperationContext();
+ServiceContext::UniqueOperationContext TaskRunnerTest::createOperationContext(
+    Client* client) const {
+    return client->makeOperationContext();
 }
 
 TaskRunner& TaskRunnerTest::getTaskRunner() const {
@@ -101,8 +84,9 @@ void TaskRunnerTest::destroyTaskRunner() {
 
 void TaskRunnerTest::setUp() {
     _threadPool.reset(new OldThreadPool(kNumThreads, "TaskRunnerTest-"));
-    resetTaskRunner(new TaskRunner(_threadPool.get(),
-                                   stdx::bind(&TaskRunnerTest::createOperationContext, this)));
+    resetTaskRunner(new TaskRunner(
+        _threadPool.get(),
+        stdx::bind(&TaskRunnerTest::createOperationContext, this, stdx::placeholders::_1)));
 }
 
 void TaskRunnerTest::tearDown() {
